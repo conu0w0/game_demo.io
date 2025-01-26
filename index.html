@@ -89,20 +89,20 @@
         <div id="card1" class="card" onclick="revealCard(1)">
             <div class="card-inner">
                 <div class="card-front">
-                    <img id="card1-front" src="images/1.png" alt="Card Front">
+                    <img id="card1-front" src="image/1.png" alt="Card Front">
                 </div>
                 <div class="card-back">
-                    <img src="images/13.png" alt="Card Back">
+                    <img src="image/13.png" alt="Card Back">
                 </div>
             </div>
         </div>
         <div id="card2" class="card" onclick="revealCard(2)">
             <div class="card-inner">
                 <div class="card-front">
-                    <img id="card2-front" src="images/2.png" alt="Card Front">
+                    <img id="card2-front" src="image/2.png" alt="Card Front">
                 </div>
                 <div class="card-back">
-                    <img src="images/13.png" alt="Card Back">
+                    <img src="image/13.png" alt="Card Back">
                 </div>
             </div>
         </div>
@@ -143,8 +143,8 @@
 
             setTimeout(() => {
                 // 等待動畫完成後更換牌面圖案
-                document.getElementById("card1-front").src = `images/${currentCards[0]}.png`;
-                document.getElementById("card2-front").src = `images/${currentCards[1]}.png`;
+                document.getElementById("card1-front").src = `image/${currentCards[0]}.png`;
+                document.getElementById("card2-front").src = `image/${currentCards[1]}.png`;
             }, 600); // 等待翻回動畫完成
         }
 
