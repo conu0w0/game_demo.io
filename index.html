@@ -21,8 +21,8 @@
         }
 
         .card {
-            width: 300px;
-            height: 450px;
+            width: 207px;
+            height: 289px;
             perspective: 1000px;
             cursor: pointer;
         }
@@ -64,6 +64,13 @@
             background-color: #ccc;
         }
 
+        .month-label {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #333;
+            height: 24px;
+        }
+
         .message {
             margin-top: 20px;
             font-size: 20px;
@@ -71,32 +78,43 @@
         }
 
         .score {
-            margin-top: 10px;
+            margin-top: 20px;
             font-size: 18px;
             color: #666;
         }
 
-        .restart-btn {
-            margin-top: 20px;
-            padding: 10px 20px;
+        .input-area {
+            margin-top: 40px;
+        }
+
+        .input-area input {
+            padding: 5px;
             font-size: 16px;
-            background-color: #007bff;
-            color: #fff;
+            width: 100px;
+            text-align: center;
+        }
+
+        .input-area button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            font-size: 16px;
+            background-color: #d34545;
+            color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
 
-        .restart-btn:hover {
-            background-color: #0056b3;
+        .input-area button:hover {
+            background-color: #ab1b1b;
         }
     </style>
 </head>
 
 <body>
     <h1>花札月份遊戲</h1>
-    <p>選擇其中一張卡牌。如果選擇的月份較小，則得分；否則遊戲結束。</p>
+    <p>選擇其中一張卡牌。如果選擇的月份較小，將獲得下注數量的兩倍小判，否則失去下注的小判。</p>
 
     <div class="game-board">
         <div id="card1" class="card" onclick="revealCard(1)">
@@ -108,6 +126,7 @@
                     <img src="image/13.png" alt="Card Back">
                 </div>
             </div>
+            <div class="month-label" id="month1"></div>
         </div>
         <div id="card2" class="card" onclick="revealCard(2)">
             <div class="card-inner">
@@ -118,19 +137,25 @@
                     <img src="image/13.png" alt="Card Back">
                 </div>
             </div>
+            <div class="month-label" id="month2"></div>
         </div>
     </div>
 
-    <div class="message" id="message">請選擇一張卡牌！</div>
-    <div class="score" id="score">分數：0</div>
-    <button class="restart-btn" onclick="restartGame()">重新開始</button>
+    <div class="input-area">
+        <input id="bet-input" type="text" placeholder="下注數量">
+        <button id="bet-button" onclick="confirmBet()">確認下注</button>
+    </div>
+
+    <div class="message" id="message">請輸入下注數量並確認！</div>
+    <div class="score" id="score">小判：100</div>
 
     <script>
         const months = Array.from({
             length: 12
         }, (_, i) => i + 1); // 1到12月
         let currentCards = [];
-        let score = 0;
+        let playerCoins = 100;
+        let currentBet = 0;
         let gameOver = false;
 
         function shuffle(array) {
@@ -141,57 +166,94 @@
         }
 
         function startGame() {
+            if (playerCoins <= 0) {
+                document.getElementById("message").textContent = "遊戲結束！您持有小判最高紀錄：了！";
+                gameOver = true;
+                return;
+            }
+
             shuffle(months);
             currentCards = [months[0], months[1]];
-            resetCards(); // 重置卡片
-            document.getElementById("message").textContent = "請選擇一張卡牌！";
-            gameOver = false;
+            resetCards();
+            document.getElementById("message").textContent = "請輸入下注數量並確認！";
+            currentBet = 0;
+
+            // 確保輸入框和按鈕啟用
+    document.getElementById("bet-input").disabled = false;
+    document.getElementById("bet-button").disabled = false;
         }
 
         function resetCards() {
-            const card1 = document.getElementById("card1");
-            const card2 = document.getElementById("card2");
-            // 先翻回卡片牌背
-            card1.classList.remove("flipped");
-            card2.classList.remove("flipped");
+            document.getElementById("card1").classList.remove("flipped");
+            document.getElementById("card2").classList.remove("flipped");
+            document.getElementById("month1").textContent = "";
+            document.getElementById("month2").textContent = "";
 
             setTimeout(() => {
-                // 等待動畫完成後更換牌面圖案
                 document.getElementById("card1-front").src = `image/${currentCards[0]}.png`;
                 document.getElementById("card2-front").src = `image/${currentCards[1]}.png`;
-            }, 600); // 等待翻回動畫完成
+            }, 600);
         }
 
-        function revealCard(cardIndex) {
-            if (gameOver) return;
+        function confirmBet() {
+    const betInput = document.getElementById("bet-input");
+    const betButton = document.getElementById("bet-button");
+    const betValue = parseInt(betInput.value, 10);
 
-            const otherCardIndex = cardIndex === 1 ? 1 : 0;
-            const selectedCard = currentCards[cardIndex - 1];
-            const otherCard = currentCards[otherCardIndex];
+    if (isNaN(betValue) || betValue <= 0) {
+        document.getElementById("message").textContent = "請輸入有效的半形數字！";
+        betInput.value = "";
+        return;
+    }
 
-            document.getElementById(`card1`).classList.add("flipped");
-            document.getElementById(`card2`).classList.add("flipped");
+    if (betValue > playerCoins) {
+        document.getElementById("message").textContent = "持有小判不足，請重新輸入！";
+        betInput.value = "";
+        return;
+    }
 
-            setTimeout(() => {
-                if (selectedCard < otherCard) {
-                    score++;
-                    document.getElementById("score").textContent = `分數：${score}`;
-                    document.getElementById("message").textContent = "恭喜！你選對了！下一局開始...";
-                    setTimeout(startGame, 1000); // 等待1秒再開始新一局
-                } else {
-                    document.getElementById("message").textContent = "遊戲結束！你的最終分數是：" + score;
-                    gameOver = true;
-                }
-            }, 600); // 等待翻轉動畫完成
+    currentBet = betValue;
+    playerCoins -= betValue;
+    document.getElementById("score").textContent = `小判：${playerCoins}`;
+    document.getElementById("message").textContent = `本局下注：${currentBet} 小判，請選擇一張卡牌！`;
+    betInput.value = "";
+
+    // 禁用下注按鈕與輸入框
+    betInput.disabled = true;
+    betButton.disabled = true;
+}
+
+function revealCard(cardIndex) {
+    if (gameOver || currentBet === 0) return;
+
+    const month1Label = document.getElementById("month1");
+    const month2Label = document.getElementById("month2");
+
+    // 顯示卡牌月份
+    document.getElementById("card1").classList.add("flipped");
+    document.getElementById("card2").classList.add("flipped");
+    month1Label.textContent = `${currentCards[0]}月`;
+    month2Label.textContent = `${currentCards[1]}月`;
+
+    setTimeout(() => {
+        const selectedCard = currentCards[cardIndex - 1];
+        const otherCard = currentCards[cardIndex === 1 ? 1 : 0];
+
+        if (selectedCard < otherCard) {
+            const winnings = currentBet * 2;
+            playerCoins += winnings;
+            document.getElementById("score").textContent = `小判：${playerCoins}`;
+            document.getElementById("message").textContent = `恭喜！您獲得 ${winnings} 小判！`;
+        } else {
+            document.getElementById("message").textContent = `很遺憾！您失去 ${currentBet} 小判！`;
         }
 
-        function restartGame() {
-            score = 0;
-            document.getElementById("score").textContent = `分數：${score}`;
-            startGame();
-        }
+        currentBet = 0;
 
-        // 初始化遊戲
+        setTimeout(startGame, 2000);
+    }, 1500);
+}
+
         startGame();
     </script>
 </body>
