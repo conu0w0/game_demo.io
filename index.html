@@ -67,20 +67,20 @@
         <div class="card" id="card1" onclick="revealCard(1)">
             <div class="card-inner">
                 <div class="card-front">
-                    <img src="images/1.png" alt="Card Front" id="card1-front">
+                    <img src="image/1.png" alt="Card Front" id="card1-front">
                 </div>
                 <div class="card-back">
-                    <img src="images/13.png" alt="Card Back">
+                    <img src="image/13.png" alt="Card Back">
                 </div>
             </div>
         </div>
         <div class="card" id="card2" onclick="revealCard(2)">
             <div class="card-inner">
                 <div class="card-front">
-                    <img src="images/2.png" alt="Card Front" id="card2-front">
+                    <img src="image/2.png" alt="Card Front" id="card2-front">
                 </div>
                 <div class="card-back">
-                    <img src="images/13.png" alt="Card Back">
+                    <img src="image/13.png" alt="Card Back">
                 </div>
             </div>
         </div>
@@ -111,8 +111,8 @@
         }
 
         function resetCards() {
-            document.getElementById("card1-front").src = `images/${currentCards[0]}.png`;
-            document.getElementById("card2-front").src = `images/${currentCards[1]}.png`;
+            document.getElementById("card1-front").src = `image/${currentCards[0]}.png`;
+            document.getElementById("card2-front").src = `image/${currentCards[1]}.png`;
             document.getElementById("card1").classList.remove("flipped");
             document.getElementById("card2").classList.remove("flipped");
         }
