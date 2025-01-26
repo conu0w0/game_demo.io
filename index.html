@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>花札月份遊戲</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        .game-board {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .card {
+            width: 100px;
+            height: 150px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transform: rotateY(0deg);
+            transition: transform 0.6s;
+        }
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+        }
+        .card-front {
+            transform: rotateY(180deg);
+        }
+        .card-back {
+            background-color: #ccc;
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #333;
+        }
+        .score {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>花札月份遊戲</h1>
+    <p>選擇其中一張卡牌。如果選擇的月份較小，則得分；否則遊戲結束。</p>
+
+    <div class="game-board">
+        <div class="card" id="card1" onclick="revealCard(1)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <img src="images/1.png" alt="Card Front" id="card1-front">
+                </div>
+                <div class="card-back">
+                    <img src="images/13.png" alt="Card Back">
+                </div>
+            </div>
+        </div>
+        <div class="card" id="card2" onclick="revealCard(2)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <img src="images/2.png" alt="Card Front" id="card2-front">
+                </div>
+                <div class="card-back">
+                    <img src="images/13.png" alt="Card Back">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="message" id="message">請選擇一張卡牌！</div>
+    <div class="score" id="score">分數：0</div>
+
+    <script>
+        const months = Array.from({ length: 12 }, (_, i) => i + 1); // 1到12月
+        let currentCards = [];
+        let score = 0;
+        let gameOver = false;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startGame() {
+            shuffle(months);
+            currentCards = [months[0], months[1]];
+            resetCards();
+            document.getElementById("message").textContent = "請選擇一張卡牌！";
+            gameOver = false;
+        }
+
+        function resetCards() {
+            document.getElementById("card1-front").src = `images/${currentCards[0]}.png`;
+            document.getElementById("card2-front").src = `images/${currentCards[1]}.png`;
+            document.getElementById("card1").classList.remove("flipped");
+            document.getElementById("card2").classList.remove("flipped");
+        }
+
+        function revealCard(cardIndex) {
+            if (gameOver) return;
+
+            const otherCardIndex = cardIndex === 1 ? 1 : 0;
+            const selectedCard = currentCards[cardIndex - 1];
+            const otherCard = currentCards[otherCardIndex];
+
+            document.getElementById(`card1`).classList.add("flipped");
+            document.getElementById(`card2`).classList.add("flipped");
+
+            setTimeout(() => {
+                if (selectedCard < otherCard) {
+                    score++;
+                    document.getElementById("score").textContent = `分數：${score}`;
+                    document.getElementById("message").textContent = "恭喜！你選對了！下一局開始...";
+                    setTimeout(startGame, 2000);
+                } else {
+                    document.getElementById("message").textContent = "遊戲結束！你的最終分數是：" + score;
+                    gameOver = true;
+                }
+            }, 600); // 等待翻轉動畫完成
+        }
+
+        // 初始化遊戲
+        startGame();
+    </script>
+</body>
+</html>
