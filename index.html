@@ -63,6 +63,23 @@
         .card-back {
             background-color: #ccc;
         }
+        
+        .card.selected {
+            box-shadow: 0px 0px 10px 2px #FFD306;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
 
         .month-label {
             margin-top: 10px;
@@ -287,16 +304,16 @@
         }
 
         function resetCards() {
-            document.getElementById("card1").classList.remove("flipped");
-            document.getElementById("card2").classList.remove("flipped");
-            document.getElementById("month1").textContent = "";
-            document.getElementById("month2").textContent = "";
+    document.getElementById("card1").classList.remove("flipped", "selected");
+    document.getElementById("card2").classList.remove("flipped", "selected");
+    document.getElementById("month1").textContent = "";
+    document.getElementById("month2").textContent = "";
 
-            setTimeout(() => {
-                document.getElementById("card1-front").src = `image/${currentCards[0]}.png`;
-                document.getElementById("card2-front").src = `image/${currentCards[1]}.png`;
-            }, 600);
-        }
+    setTimeout(() => {
+        document.getElementById("card1-front").src = `image/${currentCards[0]}.png`;
+        document.getElementById("card2-front").src = `image/${currentCards[1]}.png`;
+    }, 600);
+}
 
         function confirmBet() {
             const betInput = document.getElementById("bet-input");
@@ -327,36 +344,39 @@
         }
 
         function revealCard(cardIndex) {
-            if (gameOver || currentBet === 0) return;
+    if (gameOver || currentBet === 0) return;
 
-            document.getElementById("card1").classList.add("flipped");
-            document.getElementById("card2").classList.add("flipped");
-            document.getElementById("month1").textContent = `${currentCards[0]}月`;
-            document.getElementById("month2").textContent = `${currentCards[1]}月`;
+    const selectedCardElement = document.getElementById(`card${cardIndex}`);
+    selectedCardElement.classList.add("selected"); // 標記選中的卡片
 
-            setTimeout(() => {
-                const selectedCard = currentCards[cardIndex - 1];
-                const otherCard = currentCards[cardIndex === 1 ? 1 : 0];
+    document.getElementById("card1").classList.add("flipped");
+    document.getElementById("card2").classList.add("flipped");
+    document.getElementById("month1").textContent = `${currentCards[0]}月`;
+    document.getElementById("month2").textContent = `${currentCards[1]}月`;
 
-                if (selectedCard < otherCard) {
-                    const winnings = currentBet * 2;
-                    playerCoins += winnings;
-                    document.getElementById("message").textContent = `恭喜！您獲得 ${winnings} 枚小判！`;
-                } else {
-                    document.getElementById("message").textContent = `很遺憾！您失去 ${currentBet} 枚小判！`;
-                }
+    setTimeout(() => {
+        const selectedCard = currentCards[cardIndex - 1];
+        const otherCard = currentCards[cardIndex === 1 ? 1 : 0];
 
-                if (playerCoins > highestCoins) {
-                    highestCoins = playerCoins;
-                    localStorage.setItem("highestCoins", highestCoins);
-                }
-
-                updateScoreDisplay();
-                currentBet = 0;
-
-                setTimeout(startGame, 2000);
-            }, 1500);
+        if (selectedCard < otherCard) {
+            const winnings = currentBet * 2;
+            playerCoins += winnings;
+            document.getElementById("message").textContent = `恭喜！您獲得 ${winnings} 枚小判！`;
+        } else {
+            document.getElementById("message").textContent = `很遺憾！您失去 ${currentBet} 枚小判！`;
         }
+
+        if (playerCoins > highestCoins) {
+            highestCoins = playerCoins;
+            localStorage.setItem("highestCoins", highestCoins);
+        }
+
+        updateScoreDisplay();
+        currentBet = 0;
+
+        setTimeout(startGame, 2000);
+    }, 1500);
+}
 
         function restartGame() {
             playerCoins = 100; // 重置玩家小判數量
