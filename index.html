@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⭐200粉 紀念企劃⭐ ~花札月份遊戲~</title>
+    <title>⭐200追蹤 紀念企劃⭐ ~花札月份遊戲~</title>
     <style>
         body {
             font-family: "標楷體", sans-serif;
@@ -196,7 +196,7 @@
 </head>
 
 <body>
-    <h1>⭐200粉 紀念企劃⭐ ~花札月份遊戲~</h1>
+    <h1>⭐200追蹤 紀念企劃⭐<br>~花札月份遊戲~</h1>
     <p>選擇其中一張卡牌。如果選擇的月份較小，將獲得下注數量的兩倍小判，否則失去下注的小判。</p>
 
     <div class="game-board">
@@ -366,9 +366,9 @@
         }
 
         function shareGame() {
-            const shareText = `我玩有趣的花札月份遊戲！獲得了 ${playerCoins} 枚小判。歡迎來挑戰！`;
+            const shareText = `我玩有趣的花札月份遊戲！獲得了 ${highestCoins} 枚小判。歡迎來挑戰！`;
             const shareUrl = window.location.href; // 取得目前遊戲頁面 URL
-            const shareMessage = `${shareText} ${shareUrl}`;
+            const shareMessage = `${shareText} <a href="${shareUrl}`;
 
             if (navigator.share) {
                 // 如果支援 Web Share API
