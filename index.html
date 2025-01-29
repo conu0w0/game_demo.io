@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>花札月份遊戲</title>
+    <title>⭐200粉 紀念企劃⭐ ~花札月份遊戲~</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: "標楷體", sans-serif;
             text-align: center;
             background-color: #f9f9f9;
             padding: 20px;
@@ -109,11 +109,63 @@
         .input-area button:hover {
             background-color: #ab1b1b;
         }
+
+        .restart-button {
+            padding: 10px 20px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            /* Green background */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .restart-button:hover {
+            background-color: #45a049;
+            /* Slightly darker green on hover */
+        }
+
+        .share-button {
+            padding: 10px 20px;
+            padding: 5px 10px;
+            background-color: #008CBA;
+            /* Blue background */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-left: 10px;
+            /* Space between the two buttons */
+        }
+
+        .share-button:hover {
+            background-color: #007bb5;
+            /* Slightly darker blue on hover */
+        }
+
+        .leaderboard {
+            margin-top: 20px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .leaderboard li {
+            margin-bottom: 5px;
+        }
+
+        .top-player {
+            font-weight: bold;
+            color: #d6ab00;
+            /* Example: Blue color for top players */
+        }
     </style>
 </head>
 
 <body>
-    <h1>花札月份遊戲</h1>
+    <h1>⭐200粉 紀念企劃⭐ ~花札月份遊戲~</h1>
     <p>選擇其中一張卡牌。如果選擇的月份較小，將獲得下注數量的兩倍小判，否則失去下注的小判。</p>
 
     <div class="game-board">
@@ -147,7 +199,13 @@
     </div>
 
     <div class="message" id="message">請輸入下注數量並確認！</div>
-    <div class="score" id="score">小判：100</div>
+    <div class="score" id="score">小判： 100 枚</div>
+    <div class="score" id="highest-score">歷史最高： 100 枚</div>
+
+    <div id="button-container" style="display: none; margin-top: 20px;">
+        <button class="restart-button" onclick="restartGame()">再次挑戰</button>
+        <button class="share-button" onclick="shareGame()">分享成績</button>
+    </div>
 
     <script>
         const months = Array.from({
@@ -157,6 +215,12 @@
         let playerCoins = 100;
         let currentBet = 0;
         let gameOver = false;
+        let highestCoins = localStorage.getItem("highestCoins") ? parseInt(localStorage.getItem("highestCoins"), 10) : 100;
+
+        function updateScoreDisplay() {
+            document.getElementById("score").textContent = `小判：${playerCoins} 枚`;
+            document.getElementById("highest-score").textContent = `歷史最高：${highestCoins} 枚`;
+        }
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -166,9 +230,17 @@
         }
 
         function startGame() {
+            if (playerCoins > highestCoins) {
+                highestCoins = playerCoins;
+                localStorage.setItem("highestCoins", highestCoins);
+            }
+
+            updateScoreDisplay();
+
             if (playerCoins <= 0) {
-                document.getElementById("message").textContent = "遊戲結束！";
+                document.getElementById("message").innerHTML = `遊戲結束！<br>感謝遊玩！點我看更多：<a href="https://www.instagram.com/conu_0w0?igsh=MTFjdDQxa2d2enlmdA==" target="_blank">@conu_0w0</a>`;
                 gameOver = true;
+                document.getElementById("button-container").style.display = "block"; // 顯示按鈕
                 return;
             }
 
@@ -178,9 +250,9 @@
             document.getElementById("message").textContent = "請輸入下注數量並確認！";
             currentBet = 0;
 
-            // 確保輸入框和按鈕啟用
-    document.getElementById("bet-input").disabled = false;
-    document.getElementById("bet-button").disabled = false;
+            document.getElementById("bet-input").disabled = false;
+            document.getElementById("bet-button").disabled = false;
+            document.getElementById("button-container").style.display = "none"; // 隱藏按鈕
         }
 
         function resetCards() {
@@ -196,63 +268,90 @@
         }
 
         function confirmBet() {
-    const betInput = document.getElementById("bet-input");
-    const betButton = document.getElementById("bet-button");
-    const betValue = parseInt(betInput.value, 10);
+            const betInput = document.getElementById("bet-input");
+            const betButton = document.getElementById("bet-button");
+            const betValue = parseInt(betInput.value, 10);
 
-    if (isNaN(betValue) || betValue <= 0) {
-        document.getElementById("message").textContent = "請輸入有效的半形數字！";
-        betInput.value = "";
-        return;
-    }
+            if (isNaN(betValue) || betValue <= 0) {
+                document.getElementById("message").textContent = "請輸入有效的半形數字！";
+                betInput.value = "";
+                return;
+            }
 
-    if (betValue > playerCoins) {
-        document.getElementById("message").textContent = "持有小判不足，請重新輸入！";
-        betInput.value = "";
-        return;
-    }
+            if (betValue > playerCoins) {
+                document.getElementById("message").textContent = "持有小判不足，請重新輸入！";
+                betInput.value = "";
+                return;
+            }
 
-    currentBet = betValue;
-    playerCoins -= betValue;
-    document.getElementById("score").textContent = `小判：${playerCoins}`;
-    document.getElementById("message").textContent = `本局下注：${currentBet} 小判，請選擇一張卡牌！`;
-    betInput.value = "";
+            currentBet = betValue;
+            playerCoins -= betValue;
+            document.getElementById("score").textContent = `小判： ${playerCoins} 枚`;
+            document.getElementById("message").textContent = `本局下注： ${currentBet} 枚，請選擇一張卡牌！`;
+            betInput.value = "";
 
-    // 禁用下注按鈕與輸入框
-    betInput.disabled = true;
-    betButton.disabled = true;
-}
-
-function revealCard(cardIndex) {
-    if (gameOver || currentBet === 0) return;
-
-    const month1Label = document.getElementById("month1");
-    const month2Label = document.getElementById("month2");
-
-    // 顯示卡牌月份
-    document.getElementById("card1").classList.add("flipped");
-    document.getElementById("card2").classList.add("flipped");
-    month1Label.textContent = `${currentCards[0]}月`;
-    month2Label.textContent = `${currentCards[1]}月`;
-
-    setTimeout(() => {
-        const selectedCard = currentCards[cardIndex - 1];
-        const otherCard = currentCards[cardIndex === 1 ? 1 : 0];
-
-        if (selectedCard < otherCard) {
-            const winnings = currentBet * 2;
-            playerCoins += winnings;
-            document.getElementById("score").textContent = `小判：${playerCoins}`;
-            document.getElementById("message").textContent = `恭喜！您獲得 ${winnings} 小判！`;
-        } else {
-            document.getElementById("message").textContent = `很遺憾！您失去 ${currentBet} 小判！`;
+            // 禁用下注按鈕與輸入框
+            betInput.disabled = true;
+            betButton.disabled = true;
         }
 
-        currentBet = 0;
+        function revealCard(cardIndex) {
+            if (gameOver || currentBet === 0) return;
 
-        setTimeout(startGame, 2000);
-    }, 1500);
-}
+            document.getElementById("card1").classList.add("flipped");
+            document.getElementById("card2").classList.add("flipped");
+            document.getElementById("month1").textContent = `${currentCards[0]}月`;
+            document.getElementById("month2").textContent = `${currentCards[1]}月`;
+
+            setTimeout(() => {
+                const selectedCard = currentCards[cardIndex - 1];
+                const otherCard = currentCards[cardIndex === 1 ? 1 : 0];
+
+                if (selectedCard < otherCard) {
+                    const winnings = currentBet * 2;
+                    playerCoins += winnings;
+                    document.getElementById("message").textContent = `恭喜！您獲得 ${winnings} 枚小判！`;
+                } else {
+                    document.getElementById("message").textContent = `很遺憾！您失去 ${currentBet} 枚小判！`;
+                }
+
+                if (playerCoins > highestCoins) {
+                    highestCoins = playerCoins;
+                    localStorage.setItem("highestCoins", highestCoins);
+                }
+
+                updateScoreDisplay();
+                currentBet = 0;
+
+                setTimeout(startGame, 2000);
+            }, 1500);
+        }
+
+        function restartGame() {
+            playerCoins = 100; // 重置玩家小判數量
+            gameOver = false;
+            startGame(); // 重新開始遊戲
+            document.getElementById("score").textContent = `小判： ${playerCoins} 枚`;
+        }
+
+        function shareGame() {
+            const shareText = `我玩有趣的花札月份遊戲！獲得了 ${playerCoins} 枚小判。歡迎來挑戰！`;
+            const shareUrl = window.location.href; // 取得目前遊戲頁面 URL
+            const shareMessage = `${shareText} ${shareUrl}`;
+
+            if (navigator.share) {
+                // 如果支援 Web Share API
+                navigator.share({
+                    title: "花札月份遊戲",
+                    text: shareText,
+                    url: shareUrl
+                }).catch((error) => console.error("分享失敗：", error));
+            } else {
+                // 若不支援 Web Share API，提示用戶手動複製
+                alert(`分享此遊戲：\n${shareMessage}`);
+            }
+        }
+
 
         startGame();
     </script>
