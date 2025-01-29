@@ -240,6 +240,8 @@
     <div class="score" id="highest-score">歷史最高： 100 枚</div>
 
     <div id="button-container" style="display: none; margin-top: 20px;">
+        <p>歡迎截圖分享。</p>
+        <div id="copyArea" contenteditable="true" style="position:absolute; left:-9999px;"></div>
         <button class="restart-button" onclick="restartGame()">再次挑戰</button>
         <button class="share-button" onclick="shareGame()">分享成績</button>
     </div>
@@ -374,23 +376,22 @@
             document.getElementById("score").textContent = `小判： ${playerCoins} 枚`;
         }
 
-        function shareGame() {
-            const shareText = `我玩有趣的花札月份遊戲！獲得了 ${highestCoins} 枚小判。歡迎來挑戰！`;
-            const shareUrl = window.location.href; // 取得目前遊戲頁面 URL
-            const shareMessage = `${shareText} ${shareUrl}`;
+function shareGame() {
+    const shareText = `我玩有趣的花札月份遊戲！<br>獲得了 ${highestCoins} 枚小判。歡迎來挑戰！`;
+    const shareUrl = window.location.href; // 取得目前遊戲頁面 URL
+    const shareMessage = `${shareText} <br><a href="${shareUrl}">${shareUrl}</a>`;
 
-            if (navigator.share) {
-                // 如果支援 Web Share API
-                navigator.share({
-                    title: "花札月份遊戲",
-                    text: shareText,
-                    url: shareUrl
-                }).catch((error) => console.error("分享失敗：", error));
-            } else {
-                // 若不支援 Web Share API，提示用戶手動複製
-                alert(`分享此遊戲：\n${shareMessage}`);
-            }
-        }
+    const copyArea = document.getElementById("copyArea");
+    copyArea.innerHTML = shareMessage; // 設定 HTML 內容
+    const range = document.createRange();
+    range.selectNodeContents(copyArea);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    document.execCommand("copy");
+    alert("已複製分享內容！");
+}
 
         function adjustLayout() {
             const gameBoard = document.querySelector('.game-board');
