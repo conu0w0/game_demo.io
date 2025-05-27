@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 
 <head>
     <meta charset="UTF-8">
@@ -65,7 +65,6 @@
         }
 
         .selected {
-            /* 添加選中卡片的樣式，例如：邊框、陰影等 */
             box-shadow: 0px 0px 10px 2px #FFD306;
         }
 
@@ -116,10 +115,8 @@
         }
 
         .restart-button {
-            padding: 10px 20px;
             padding: 5px 10px;
             background-color: #4CAF50;
-            /* Green background */
             color: white;
             border: none;
             border-radius: 5px;
@@ -129,73 +126,43 @@
 
         .restart-button:hover {
             background-color: #45a049;
-            /* Slightly darker green on hover */
         }
 
         .share-button {
-            padding: 10px 20px;
             padding: 5px 10px;
             background-color: #008CBA;
-            /* Blue background */
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
             margin-left: 10px;
-            /* Space between the two buttons */
         }
 
         .share-button:hover {
             background-color: #007bb5;
-            /* Slightly darker blue on hover */
         }
 
-        .leaderboard {
-            margin-top: 20px;
-            list-style: none;
-            padding: 0;
+        #helpModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
         }
 
-        .leaderboard li {
-            margin-bottom: 5px;
-        }
-
-        .top-player {
-            font-weight: bold;
-            color: #d6ab00;
-            /* Example: Blue color for top players */
-        }
-
-        @media (max-width: 768px) {
-            .game-board {
-                display: flex;
-                justify-content: center;
-                gap: px;
-                margin-top: 20px;
-            }
-
-            .card {
-                width: 150px;
-                /* 縮小卡片 */
-                height: 210px;
-            }
-
-            .message,
-            .score {
-                font-size: 16px;
-                /* 縮小文字 */
-            }
-
-            .input-area input {
-                width: 80px;
-                font-size: 14px;
-            }
-
-            .input-area button {
-                font-size: 14px;
-                padding: 4px 8px;
-            }
+        #helpModal .content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+            text-align: left;
         }
     </style>
 </head>
@@ -238,6 +205,11 @@
     <div class="message" id="message">請輸入下注數量並確認！</div>
     <div class="score" id="score">小判： 100 枚</div>
     <div class="score" id="highest-score">歷史最高： 100 枚</div>
+    <div class="score" id="history-display"></div>
+
+    <div style="margin-top: 20px;">
+        <button onclick="toggleHelp()">❓ 規則說明</button>
+    </div>
 
     <div id="button-container" style="display: none; margin-top: 20px;">
         <p>歡迎截圖分享。</p>
@@ -246,19 +218,36 @@
         <button class="share-button" onclick="shareGame()">分享成績</button>
     </div>
 
+    <div id="helpModal">
+        <div class="content">
+            <h3>🎴 遊戲規則</h3>
+            <p>你將看到兩張卡牌，分別代表不同的月份。</p>
+            <p>輸入下注數量，然後選擇其中一張卡。</p>
+            <p>如果選中的月份較小，你會獲得下注的兩倍小判；反之則失去下注。</p>
+            <p>遊戲結束條件為小判歸零。</p>
+            <button onclick="toggleHelp()">關閉說明</button>
+        </div>
+    </div>
+
     <script>
-        const months = Array.from({
-            length: 12
-        }, (_, i) => i + 1); // 1到12月
+        const months = Array.from({ length: 12 }, (_, i) => i + 1);
         let currentCards = [];
         let playerCoins = 100;
         let currentBet = 0;
         let gameOver = false;
-        let highestCoins = localStorage.getItem("highestCoins") ? parseInt(localStorage.getItem("highestCoins"), 10) : 100;
+        let highestCoins = localStorage.getItem("highestCoins") ? parseInt(localStorage.getItem("highestCoins")) : 100;
+
+        function preloadImages() {
+            for (let i = 1; i <= 13; i++) {
+                const img = new Image();
+                img.src = `image/${i}.png`;
+            }
+        }
 
         function updateScoreDisplay() {
             document.getElementById("score").textContent = `小判：${playerCoins} 枚`;
             document.getElementById("highest-score").textContent = `歷史最高：${highestCoins} 枚`;
+            document.getElementById("history-display").innerHTML = showGameHistory();
         }
 
         function shuffle(array) {
@@ -277,9 +266,9 @@
             updateScoreDisplay();
 
             if (playerCoins <= 0) {
-                document.getElementById("message").innerHTML = `遊戲結束！<br>感謝遊玩！點我看更多：<a href="https://www.instagram.com/conu_0w0?igsh=MTFjdDQxa2d2enlmdA==" target="_blank">@conu_0w0</a>`;
+                document.getElementById("message").innerHTML = `遊戲結束！<br>感謝遊玩！`;
                 gameOver = true;
-                document.getElementById("button-container").style.display = "block"; // 顯示按鈕
+                document.getElementById("button-container").style.display = "block";
                 return;
             }
 
@@ -291,7 +280,7 @@
 
             document.getElementById("bet-input").disabled = false;
             document.getElementById("bet-button").disabled = false;
-            document.getElementById("button-container").style.display = "none"; // 隱藏按鈕
+            document.getElementById("button-container").style.display = "none";
         }
 
         function resetCards() {
@@ -325,11 +314,9 @@
 
             currentBet = betValue;
             playerCoins -= betValue;
-            document.getElementById("score").textContent = `小判： ${playerCoins} 枚`;
+            updateScoreDisplay();
             document.getElementById("message").textContent = `本局下注： ${currentBet} 枚，請選擇一張卡牌！`;
             betInput.value = "";
-
-            // 禁用下注按鈕與輸入框
             betInput.disabled = true;
             betButton.disabled = true;
         }
@@ -338,7 +325,7 @@
             if (gameOver || currentBet === 0) return;
 
             const selectedCardElement = document.getElementById(`card${cardIndex}`);
-            selectedCardElement.classList.add("selected"); // 標記選中的卡片
+            selectedCardElement.classList.add("selected");
 
             document.getElementById("card1").classList.add("flipped");
             document.getElementById("card2").classList.add("flipped");
@@ -362,53 +349,52 @@
                     localStorage.setItem("highestCoins", highestCoins);
                 }
 
+                saveGameRecord(playerCoins);
                 updateScoreDisplay();
                 currentBet = 0;
-
                 setTimeout(startGame, 2000);
             }, 1500);
         }
 
+        function saveGameRecord(score) {
+            let history = localStorage.getItem("scoreHistory");
+            let historyArray = history ? JSON.parse(history) : [];
+            historyArray.unshift(score);
+            if (historyArray.length > 5) historyArray = historyArray.slice(0, 5);
+            localStorage.setItem("scoreHistory", JSON.stringify(historyArray));
+        }
+
+        function showGameHistory() {
+            let history = localStorage.getItem("scoreHistory");
+            let historyArray = history ? JSON.parse(history) : [];
+            return historyArray.map((s, i) => `第 ${i + 1} 場：${s} 枚小判`).join("<br>");
+        }
+
         function restartGame() {
-            playerCoins = 100; // 重置玩家小判數量
+            playerCoins = 100;
             gameOver = false;
-            startGame(); // 重新開始遊戲
-            document.getElementById("score").textContent = `小判： ${playerCoins} 枚`;
+            startGame();
         }
 
-function shareGame() {
-    const shareText = `我玩有趣的花札月份遊戲！<br>獲得了 ${highestCoins} 枚小判。歡迎來挑戰！`;
-    const shareUrl = window.location.href; // 取得目前遊戲頁面 URL
-    const shareMessage = `${shareText} <br><a href="${shareUrl}">${shareUrl}</a>`;
-
-    const copyArea = document.getElementById("copyArea");
-    copyArea.innerHTML = shareMessage; // 設定 HTML 內容
-    const range = document.createRange();
-    range.selectNodeContents(copyArea);
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    document.execCommand("copy");
-    alert("已複製分享內容！");
-}
-
-        function adjustLayout() {
-            const gameBoard = document.querySelector('.game-board');
-            if (window.innerWidth < 768) {
-                gameBoard.style.flexDirection = 'flex';
-            } else {
-                gameBoard.style.flexDirection = 'row';
-            }
+        function shareGame() {
+            const shareText = `我玩有趣的花札月份遊戲！\n獲得了 ${highestCoins} 枚小判。歡迎來挑戰！\n${window.location.href}`;
+            const copyArea = document.getElementById("copyArea");
+            copyArea.innerHTML = shareText;
+            const range = document.createRange();
+            range.selectNodeContents(copyArea);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            document.execCommand("copy");
+            alert("已複製分享內容！");
         }
 
-        // 初始設定
-        adjustLayout();
+        function toggleHelp() {
+            const modal = document.getElementById("helpModal");
+            modal.style.display = modal.style.display === "flex" ? "none" : "flex";
+        }
 
-        // 監聽視窗大小變化
-        window.addEventListener('resize', adjustLayout);
-
-
+        preloadImages();
         startGame();
     </script>
 </body>
